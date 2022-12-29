@@ -88,7 +88,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.25</version>
+			<version>5.1.49</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -199,13 +199,10 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<mkdir dir="logs" />
-								<copy file="${basedir}/src/main/resources/messages_en.properties"
-									tofile="${project.build.outputDirectory}/messages.properties" />
-								<copy file="${basedir}/src/main/resources/indexpage_en.properties"
-									tofile="${project.build.outputDirectory}/indexpage.properties" />
-								<delete
-									file="${project.build.outputDirectory}/org/t246osslab/easybuggy/core/utils/DeleteClassWhileMavenBuild.class" />
+								<mkdir dir="logs"/>
+								<copy file="${basedir}/src/main/resources/messages_en.properties" tofile="${project.build.outputDirectory}/messages.properties"/>
+								<copy file="${basedir}/src/main/resources/indexpage_en.properties" tofile="${project.build.outputDirectory}/indexpage.properties"/>
+								<delete file="${project.build.outputDirectory}/org/t246osslab/easybuggy/core/utils/DeleteClassWhileMavenBuild.class"/>
 							</tasks>
 						</configuration>
 					</execution>
