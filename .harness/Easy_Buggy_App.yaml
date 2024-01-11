@@ -1,0 +1,39 @@
+pipeline:
+  name: Easy Buggy App
+  identifier: Easy_Buggy_App
+  projectIdentifier: Product_Exploratory
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.tejakummarikuntla
+        repoName: easybuggy-vulnerable-application
+        build: <+input>
+  stages:
+    - stage:
+        name: Build
+        identifier: Build
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: BuildAndPushDockerRegistry
+                  name: BuildAndPushDockerRegistry_1
+                  identifier: BuildAndPushDockerRegistry_1
+                  spec:
+                    connectorRef: tejakummarikutla
+                    repo: tejakummarikuntla/easy-buggy-app
+                    tags:
+                      - harness
+          slsa_provenance:
+            enabled: false
