@@ -35,5 +35,32 @@ pipeline:
                     repo: tejakummarikuntla/easy-buggy-app
                     tags:
                       - harness
+                  when:
+                    stageStatus: Success
+                    condition: 1==0
+              - step:
+                  type: SscaOrchestration
+                  name: SscaOrchestration_1
+                  identifier: SscaOrchestration_1
+                  spec:
+                    attestation:
+                      type: cosign
+                      spec:
+                        privateKey: Teja_CoSign_Private_Key
+                        password: Teja_Cosign_Password
+                    source:
+                      type: image
+                      spec:
+                        connector: tejakummarikutla
+                        image: tejakummarikuntla/easy-buggy-app:harness
+                    tool:
+                      type: Syft
+                      spec:
+                        format: spdx-json
+                    mode: generation
+                    resources:
+                      limits:
+                        memory: 500Mi
+                        cpu: "0.5"
           slsa_provenance:
             enabled: false
