@@ -62,5 +62,26 @@ pipeline:
                       limits:
                         memory: 500Mi
                         cpu: "0.5"
+              - step:
+                  type: SscaEnforcement
+                  name: SscaEnforcement_1
+                  identifier: SscaEnforcement_1
+                  spec:
+                    source:
+                      type: image
+                      spec:
+                        connector: tejakummarikutla
+                        image: tejakummarikuntla/easy-buggy-app:harness
+                    verifyAttestation:
+                      type: cosign
+                      spec:
+                        publicKey: Teja_CoSign_Key
+                    policy:
+                      policySets:
+                        - account.Sample_policy_set
+                    resources:
+                      limits:
+                        memory: 500Mi
+                        cpu: "0.5"
           slsa_provenance:
             enabled: false
