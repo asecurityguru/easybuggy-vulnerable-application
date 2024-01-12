@@ -37,7 +37,6 @@ pipeline:
                       - harness
                   when:
                     stageStatus: Success
-                    condition: 1==0
               - step:
                   type: SscaOrchestration
                   name: SscaOrchestration_1
