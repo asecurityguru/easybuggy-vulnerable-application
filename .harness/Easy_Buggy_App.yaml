@@ -93,20 +93,14 @@ pipeline:
         spec:
           deploymentType: Kubernetes
           service:
-            serviceRef: example_project
-            serviceInputs:
-              serviceDefinition:
-                type: Kubernetes
-                spec:
-                  artifacts:
-                    primary:
-                      primaryArtifactRef: <+input>
-                      sources: <+input>
+            serviceRef: <+input>
+            serviceInputs: <+input>
           environment:
-            environmentRef: example_env
+            environmentRef: <+input>
             deployToAll: false
-            infrastructureDefinitions:
-              - identifier: TejaInfra
+            environmentInputs: <+input>
+            serviceOverrideInputs: <+input>
+            infrastructureDefinitions: <+input>
           execution:
             steps:
               - step:
