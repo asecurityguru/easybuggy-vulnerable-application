@@ -1,0 +1,48 @@
+pipeline:
+  name: Repo SBOM test
+  identifier: Repo_SBOM_test
+  projectIdentifier: Product_Exploratory
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.tejakummarikuntla
+        repoName: easybuggy-vulnerable-application
+        build: <+input>
+  stages:
+    - stage:
+        name: Build
+        identifier: Build
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: SscaOrchestration
+                  name: SscaOrchestration_1
+                  identifier: SscaOrchestration_1
+                  spec:
+                    mode: generation
+                    tool:
+                      type: Syft
+                      spec:
+                        format: spdx-json
+                    source:
+                      type: repository
+                      spec:
+                        url: github.com/tejakummarikuntla/easybuggy-vulnerable-application
+                        variant_type: branch
+                        variant: main
+                    resources:
+                      limits:
+                        memory: 500Mi
+                        cpu: "0.5"
