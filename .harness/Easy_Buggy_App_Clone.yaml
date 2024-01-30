@@ -1,0 +1,129 @@
+---
+pipeline:
+  projectIdentifier: "Product_Exploratory"
+  orgIdentifier: "default"
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: "account.tejakummarikuntla"
+        repoName: "easybuggy-vulnerable-application"
+        build: "<+input>"
+  stages:
+  - stage:
+      name: "Build"
+      identifier: "Build"
+      description: ""
+      type: "CI"
+      spec:
+        cloneCodebase: true
+        platform:
+          os: "Linux"
+          arch: "Amd64"
+        runtime:
+          type: "Cloud"
+          spec: {}
+        execution:
+          steps:
+          - step:
+              type: "BuildAndPushDockerRegistry"
+              name: "BuildAndPushDockerRegistry_1"
+              identifier: "BuildAndPushDockerRegistry_1"
+              spec:
+                connectorRef: "tejakummarikutla"
+                repo: "tejakummarikuntla/easy-buggy-app"
+                tags:
+                - "harness"
+              when:
+                stageStatus: "Success"
+                condition: "1==0"
+          - step:
+              type: "SscaOrchestration"
+              name: "SscaOrchestration_1"
+              identifier: "SscaOrchestration_1"
+              spec:
+                attestation:
+                  type: "cosign"
+                  spec:
+                    privateKey: "Teja_CoSign_Private_Key"
+                    password: "Teja_Cosign_Password"
+                source:
+                  type: "image"
+                  spec:
+                    connector: "tejakummarikutla"
+                    image: "tejakummarikuntla/easy-buggy-app:harness"
+                tool:
+                  type: "Syft"
+                  spec:
+                    format: "spdx-json"
+                mode: "generation"
+                resources:
+                  limits:
+                    memory: "500Mi"
+                    cpu: "0.5"
+          - step:
+              type: "SscaEnforcement"
+              name: "SscaEnforcement_1"
+              identifier: "SscaEnforcement_1"
+              spec:
+                source:
+                  type: "image"
+                  spec:
+                    connector: "tejakummarikutla"
+                    image: "tejakummarikuntla/easy-buggy-app:harness"
+                verifyAttestation:
+                  type: "cosign"
+                  spec:
+                    publicKey: "Teja_CoSign_Key"
+                policy:
+                  policySets:
+                  - "account.Sample_policy_set"
+                resources:
+                  limits:
+                    memory: "500Mi"
+                    cpu: "0.5"
+        slsa_provenance:
+          enabled: false
+  - stage:
+      name: "Deploy K8"
+      identifier: "Deploy_K8"
+      description: ""
+      type: "Deployment"
+      spec:
+        deploymentType: "Kubernetes"
+        service:
+          serviceRef: "<+input>"
+          serviceInputs: "<+input>"
+        environment:
+          environmentRef: "<+input>"
+          deployToAll: false
+          environmentInputs: "<+input>"
+          serviceOverrideInputs: "<+input>"
+          infrastructureDefinitions: "<+input>"
+        execution:
+          steps:
+          - step:
+              name: "Rollout Deployment"
+              identifier: "rolloutDeployment"
+              type: "K8sRollingDeploy"
+              timeout: "10m"
+              spec:
+                skipDryRun: false
+                pruningEnabled: false
+          rollbackSteps:
+          - step:
+              name: "Rollback Rollout Deployment"
+              identifier: "rollbackRolloutDeployment"
+              type: "K8sRollingRollback"
+              timeout: "10m"
+              spec:
+                pruningEnabled: false
+      tags: {}
+      failureStrategies:
+      - onFailure:
+          errors:
+          - "AllErrors"
+          action:
+            type: "StageRollback"
+  identifier: "Easy_Buggy_App_Clone"
+  name: "Easy Buggy App - Clone"
