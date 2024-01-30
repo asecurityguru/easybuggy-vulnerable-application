@@ -85,6 +85,9 @@ pipeline:
                         cpu: "0.5"
           slsa_provenance:
             enabled: false
+        when:
+          pipelineStatus: Success
+          condition: 1==0
     - stage:
         name: Deploy K8
         identifier: Deploy_K8
