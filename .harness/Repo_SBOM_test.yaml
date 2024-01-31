@@ -46,15 +46,6 @@ pipeline:
                       limits:
                         memory: 500Mi
                         cpu: "0.5"
-              - step:
-                  type: BuildAndPushDockerRegistry
-                  name: BuildAndPushDockerRegistry_1
-                  identifier: BuildAndPushDockerRegistry_1
-                  spec:
-                    connectorRef: tejakummarikutla
-                    repo: tejakummarikuntla/easy-buggy-app
-                    tags:
-                      - latest
     - stage:
         name: Deploy
         identifier: Deploy
