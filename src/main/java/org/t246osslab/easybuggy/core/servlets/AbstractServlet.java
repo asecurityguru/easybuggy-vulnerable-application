@@ -200,7 +200,6 @@ public abstract class AbstractServlet extends HttpServlet {
      */
     protected void vulnerableSQLMethod(HttpServletRequest req) {
         String userId = req.getParameter("userid");
-        String query = "SELECT * FROM users WHERE userid = '" + userId + "'";
+        String query = "SELECT * FROM users WHERE userid = '" + userId + "'"; // SQL Injection vulnerability
 
-        try (Connection conn = DriverManager.getConnection("jdbc:yourdatabaseurl", "username", "password");
-             Statement
+        try (Connection conn = DriverManager.getConnection
