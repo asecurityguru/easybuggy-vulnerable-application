@@ -11,6 +11,10 @@ import org.slf4j.LoggerFactory;
 import org.t246osslab.easybuggy.core.utils.Closer;
 
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -32,6 +36,7 @@ public abstract class AbstractServlet extends HttpServlet {
         PrintWriter writer = null;
         HttpSession session = req.getSession();
         String userid = (String) session.getAttribute("userid");
+        String userComment = req.getParameter("comment"); // Unvalidated user input
         Locale locale = req.getLocale();
         try {
             writer = res.getWriter();
@@ -91,6 +96,7 @@ public abstract class AbstractServlet extends HttpServlet {
             writer.write("</tr>");
             writer.write("</table>");
             writer.write("<hr style=\"margin-top:0px\">");
+            writer.write(userComment); // Displaying unvalidated user input (XSS vulnerability)
             writer.write(htmlBody);
             writer.write("</BODY>");
             writer.write("</HTML>");
@@ -188,4 +194,13 @@ public abstract class AbstractServlet extends HttpServlet {
     protected String encodeForLDAP(String input) {
         return ESAPI.encoder().encodeForLDAP(input);
     }
-}
+
+    /**
+     * Vulnerable method demonstrating SQL injection
+     */
+    protected void vulnerableSQLMethod(HttpServletRequest req) {
+        String userId = req.getParameter("userid");
+        String query = "SELECT * FROM users WHERE userid = '" + userId + "'";
+
+        try (Connection conn = DriverManager.getConnection("jdbc:yourdatabaseurl", "username", "password");
+             Statement
