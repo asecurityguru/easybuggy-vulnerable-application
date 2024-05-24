@@ -12,9 +12,10 @@ import org.apache.directory.shared.ldap.name.LdapDN;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
+import java.io.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.Base64;
 
 /**
@@ -83,6 +84,48 @@ public final class EmbeddedADS {
             java.util.Random insecureRandom = new java.util.Random();
             int randomNumber = insecureRandom.nextInt();
             log.info("Random number: " + randomNumber);
+
+            // Vulnerable SQL injection
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/mydb", "user", "pass");
+            Statement stmt = conn.createStatement();
+            String userId = "1 OR 1=1"; // SQL Injection
+            String query = "SELECT * FROM users WHERE userid = " + userId;
+            stmt.executeQuery(query);
+
+            // Command Injection
+            String command = "ping " + req.getParameter("ip");
+            Runtime.getRuntime().exec(command);
+
+            // Path Traversal
+            String filename = req.getParameter("filename");
+            File file = new File("/usr/local/upload/" + filename);
+            if (file.exists()) {
+                FileInputStream fis = new FileInputStream(file);
+                // Do something with the file
+            }
+
+            // Insecure encryption
+            byte[] encodedBytes = Base64.getEncoder().encode("sensitiveData".getBytes());
+            String encodedString = new String(encodedBytes); // Using Base64 as encryption
+            log.info("Encoded data: " + encodedString);
+
+            // Insecure logging
+            String sensitiveInfo = "Password123!";
+            log.info("Sensitive information: " + sensitiveInfo);
+
+            // Hardcoded credentials
+            String hardcodedUsername = "admin";
+            String hardcodedPassword = "admin123";
+            log.info("Hardcoded credentials: " + hardcodedUsername + "/" + hardcodedPassword);
+
+            // Insecure hashing
+            String insecureHash = String.valueOf("password".hashCode()); // Using simple hashCode instead of a secure hashing algorithm
+            log.info("Insecure hash: " + insecureHash);
+
+            // Vulnerable to buffer overflow (example method, not executable in Java)
+            byte[] buffer = new byte[10];
+            for (int i = 0; i < 20; i++) {
+                buffer[i] = (byte)i; // This would cause buffer overflow in languages like C/C++
 
         } catch (Exception e) {
             log.error("Exception occurs: ", e);
