@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.t246osslab.easybuggy.core.utils.Closer;
 
 import java.io.PrintWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -199,7 +202,4 @@ public abstract class AbstractServlet extends HttpServlet {
      * Vulnerable method demonstrating SQL injection
      */
     protected void vulnerableSQLMethod(HttpServletRequest req) {
-        String userId = req.getParameter("userid");
-        String query = "SELECT * FROM users WHERE userid = '" + userId + "'"; // SQL Injection vulnerability
-
-        try (Connection conn = DriverManager.getConnection
+        String userId = req.getParameter("
