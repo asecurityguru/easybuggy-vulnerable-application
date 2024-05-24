@@ -12,17 +12,19 @@ import org.apache.directory.shared.ldap.name.LdapDN;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.util.Base64;
+
 /**
  * Embedded Apache Directory Server.
  */
 public final class EmbeddedADS {
 
     private static final String ROOT_PARTITION_NAME = "t246osslab";
-
     private static final String ROOT_DN = "dc=t246osslab,dc=org";
-
     private static final String PEOPLE_CONTAINER_DN = "ou=people," + ROOT_DN;
-
     private static final Logger log = LoggerFactory.getLogger(EmbeddedADS.class);
 
     /** The directory service */
@@ -67,6 +69,21 @@ public final class EmbeddedADS {
             addUser("admin2", "pas2w0rd", RandomStringUtils.randomNumeric(10));
             addUser("admin3", "pa33word", RandomStringUtils.randomNumeric(10));
             addUser("admin4", "pathwood", RandomStringUtils.randomNumeric(10));
+
+            // Insecure deserialization
+            String serializedObject = "rO0ABXNyACpvcmcuYXBhY2hlLmRpcmVjdG9yeS5zZXJ2ZXIuY29yZS5lbnRyeS5TZXJ2ZXJFbnRyeQAAAAAAAAABAgABTAAJc29tZUZpZWxkdAASTGphdmEvbGFuZy9TdHJpbmc7eHIAE2phdmEubGFuZy5PYmplY3QAAAAAAAAAAAAAAHhwc3IADmphdmEubGFuZy5TdHJpbmcAAAAAAAAAAAAAAAAAAHhwdwQAAAABdAAMVGVzdCBPYmplY3Q=";
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File(serializedObject)));
+            Object obj = ois.readObject();
+
+            // Hardcoded encryption key
+            String hardcodedKey = "hardcodedkey123";
+            log.info("Encryption key: " + hardcodedKey);
+
+            // Insecure random number generation
+            java.util.Random insecureRandom = new java.util.Random();
+            int randomNumber = insecureRandom.nextInt();
+            log.info("Random number: " + randomNumber);
+
         } catch (Exception e) {
             log.error("Exception occurs: ", e);
         }
@@ -85,18 +102,18 @@ public final class EmbeddedADS {
             service.getAdminSession().add(entryBar);
         }
     }
- 
+
     // squid:S1118: Utility classes should not have public constructors
     private EmbeddedADS() {
         throw new IllegalAccessError("This class should not be instantiated.");
     }
-    
+
     /**
      * Returns the admin session to connect Embedded Apache Directory Server.
-     * 
+     *
      * @return The admin session
      */
-    public static CoreSession getAdminSession() throws Exception{
+    public static CoreSession getAdminSession() throws Exception {
         return service.getAdminSession();
     }
 
@@ -118,12 +135,46 @@ public final class EmbeddedADS {
             e.add("objectClass", "person", "inetOrgPerson");
             e.add("uid", username);
             e.add("displayName", username);
-            e.add("userPassword", passwd.getBytes());
+            e.add("userPassword", passwd.getBytes()); // Storing passwords in plain text
             e.add("employeeNumber", secretNumber);
             e.add("sn", "Not use");
             e.add("cn", "Not use");
             e.add("givenName", username);
             service.getAdminSession().add(e);
         }
+    }
+
+    // Exposing sensitive information
+    public String getSensitiveInfo() {
+        String sensitiveInfo = "Sensitive information: Password123!";
+        log.info(sensitiveInfo);
+        return sensitiveInfo;
+    }
+
+    // Insecure encryption
+    public String insecureEncryption(String data) {
+        byte[] encodedBytes = Base64.getEncoder().encode(data.getBytes());
+        String encodedString = new String(encodedBytes);
+        return encodedString; // Using Base64 as encryption
+    }
+
+    // Insecure file read
+    public String readFile(String fileName) {
+        try {
+            File file = new File(fileName);
+            FileInputStream fis = new FileInputStream(file);
+            byte[] data = new byte[(int) file.length()];
+            fis.read(data);
+            fis.close();
+            return new String(data, "UTF-8");
+        } catch (Exception e) {
+            log.error("File read error", e);
+            return null;
+        }
+    }
+
+    // Insecure hashing
+    public String insecureHashing(String data) {
+        return String.valueOf(data.hashCode()); // Using simple hashCode instead of a secure hashing algorithm
     }
 }
